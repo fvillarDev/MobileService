@@ -1,0 +1,1 @@
+﻿<%@ WebService Language="C#" CodeBehind="ServiceMobile.asmx.cs" Class="MobileService.ServiceMobile" %>
