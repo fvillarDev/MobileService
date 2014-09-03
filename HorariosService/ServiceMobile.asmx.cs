@@ -33,13 +33,17 @@ namespace MobileService
             while (isNoData)
             {
                 res = GetData(stop, bus);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(res);
-                if (!doc.DocumentElement.FirstChild.Value.Contains("Error"))
-                {
+                if (res.Contains("ErrorMessage") && res.Contains("nivel"))
+                { }
+                else
                     isNoData = false;
-                    res = doc.DocumentElement.FirstChild.Value.ToString();
-                }
+                //XmlDocument doc = new XmlDocument();
+                //doc.LoadXml(res);
+                //if (!doc.DocumentElement.FirstChild.Value.Contains("Error"))
+                //{
+                //    isNoData = false;
+                //    res = doc.DocumentElement.FirstChild.Value.ToString();
+                //}
             }
             return res;
         }
@@ -52,13 +56,10 @@ namespace MobileService
             while (isNoData)
             {
                 res = StopsByBus(bus, lat, lng);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(res);
-                if (!doc.DocumentElement.FirstChild.Value.Contains("Error"))
-                {
+                if (res.Contains("ErrorMessage") && res.Contains("nivel"))
+                { }
+                else
                     isNoData = false;
-                    res = doc.DocumentElement.FirstChild.Value.ToString();
-                }
             }
             return res;
         }
@@ -71,13 +72,10 @@ namespace MobileService
             while (isNoData)
             {
                 res = GetParadaStop(stop);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(res);
-                if (!doc.DocumentElement.FirstChild.Value.Contains("Error"))
-                {
+                if (res.Contains("ErrorMessage") && res.Contains("nivel"))
+                { }
+                else
                     isNoData = false;
-                    res = doc.DocumentElement.FirstChild.Value.ToString();
-                }
             }
             return res;
         }
