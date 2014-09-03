@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Net;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace MobileService
 {
@@ -29,8 +30,23 @@ namespace MobileService
         [WebMethod]
         public string GetHourMobile(string stop, string bus)
         {
-            string res = GetData(stop, bus);
-            return res;
+            bool isNoData = true;
+            Resultado rdo = new Resultado();
+            while (isNoData)
+            {
+                string res = GetData(stop, bus);
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.Formatting = Formatting.Indented;
+                settings.NullValueHandling = NullValueHandling.Include;
+                rdo = JsonConvert.DeserializeObject<Resultado>(res, settings);
+                if (rdo.Status != "Error")
+                {
+                    isNoData = false;
+                }
+            }
+            if (rdo.Data.Length > 0)
+                return rdo.Data[0].ToString();
+            else return "";
         }
 
         private string GetData(string parada, string linea)
