@@ -7,7 +7,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Net;
 using System.IO;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
+using System.Xml;
 
 namespace MobileService
 {
@@ -31,22 +32,27 @@ namespace MobileService
         public string GetHourMobile(string stop, string bus)
         {
             bool isNoData = true;
-            Resultado rdo = new Resultado();
+            //Resultado rdo = new Resultado();
             while (isNoData)
             {
                 string res = GetData(stop, bus);
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.Formatting = Formatting.Indented;
-                settings.NullValueHandling = NullValueHandling.Include;
-                rdo = JsonConvert.DeserializeObject<Resultado>(res, settings);
-                if (rdo.Status != "Error")
-                {
+                //JsonSerializerSettings settings = new JsonSerializerSettings();
+                //settings.Formatting = Formatting.Indented;
+                //settings.NullValueHandling = NullValueHandling.Include;
+                //rdo = JsonConvert.DeserializeObject<Resultado>(res, settings);
+                //if (rdo.Status != "Error")
+                //{
+                //    isNoData = false;
+                //}
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(res);
+                if(!doc.DocumentElement.FirstChild.Value.Contains("Error"))
                     isNoData = false;
-                }
             }
-            if (rdo.Data.Length > 0)
-                return rdo.Data[0].ToString();
-            else return "";
+            //if (rdo.Data.Length > 0)
+            //    return rdo.Data[0].ToString();
+            //else return "";
+            return "";
         }
 
         private string GetData(string parada, string linea)
