@@ -21,6 +21,9 @@ namespace MobileService
     [System.Web.Script.Services.ScriptService]
     public class ServiceMobile : System.Web.Services.WebService
     {
+        private string idGeo = "dd540f1f-44ac-4929-a4e8-777a5d9b66b3";
+        private string key = "n9tNJicGUqLc6KbDzeGoVNoDcNC70rjEgrXrKM8a";
+        string BASE_URL = "http://ws_geosolution.geosolution.com.ar/mobile_test/Mobile/";
 
         [WebMethod]
         public string TestService()
@@ -32,34 +35,42 @@ namespace MobileService
         public string GetHourMobile(string stop, string bus)
         {
             bool isNoData = true;
-            //Resultado rdo = new Resultado();
+            string res = "";
             while (isNoData)
             {
-                string res = GetData(stop, bus);
-                //JsonSerializerSettings settings = new JsonSerializerSettings();
-                //settings.Formatting = Formatting.Indented;
-                //settings.NullValueHandling = NullValueHandling.Include;
-                //rdo = JsonConvert.DeserializeObject<Resultado>(res, settings);
-                //if (rdo.Status != "Error")
-                //{
-                //    isNoData = false;
-                //}
+                res = GetData(stop, bus);
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(res);
-                if(!doc.DocumentElement.FirstChild.Value.Contains("Error"))
+                if (!doc.DocumentElement.FirstChild.Value.Contains("Error"))
+                {
                     isNoData = false;
+                    res = doc.DocumentElement.FirstChild.Value.ToString();
+                }
             }
-            //if (rdo.Data.Length > 0)
-            //    return rdo.Data[0].ToString();
-            //else return "";
-            return "";
+            return res;
+        }
+
+        [WebMethod]
+        public string GetNearStopsByBus(string bus, string lat, string lng)
+        {
+            bool isNoData = true;
+            string res = "";
+            while (isNoData)
+            {
+                res = StopsByBus(bus, lat, lng);
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(res);
+                if (!doc.DocumentElement.FirstChild.Value.Contains("Error"))
+                {
+                    isNoData = false;
+                    res = doc.DocumentElement.FirstChild.Value.ToString();
+                }
+            }
+            return res;
         }
 
         private string GetData(string parada, string linea)
         {
-            string idGeo = "dd540f1f-44ac-4929-a4e8-777a5d9b66b3";
-            string key = "n9tNJicGUqLc6KbDzeGoVNoDcNC70rjEgrXrKM8a";
-
             DateTime date = DateTime.Now;
             string dayToSend = date.ToString("yyyy-MM-ddThh:mm:ss");
             string mensajeFecha = date.ToString("yyyyMMddhhmmss");
@@ -74,8 +85,35 @@ namespace MobileService
 
             hashBuild = Convert.ToBase64String(keyArray, 0, keyArray.Length);
 
-            string uri = "http://ws_geosolution.geosolution.com.ar/mobile_test/Mobile/CalcularMobile?" +
+            string uri = BASE_URL + "CalcularMobile?" +
                          "parada=" + parada + "&linea=" + linea +
+                         "&id=" + idGeo +
+                         "&hash=" + hashBuild + "&fecha=" + dayToSend;
+
+            WebRequest req = WebRequest.Create(uri);
+            WebResponse resp = req.GetResponse();
+
+            StreamReader sr = new StreamReader(resp.GetResponseStream());
+            return sr.ReadToEnd().Trim();
+        }
+
+        private string StopsByBus(string linea, string lat, string lng)
+        { 
+            DateTime date = DateTime.Now;
+            string dayToSend = date.ToString("yyyy-MM-ddThh:mm:ss");
+            string mensajeFecha = date.ToString("yyyyMMddhhmmss");
+            string hashBuild = "";
+            byte[] keyArray;
+            using (HMACMD5 m = new HMACMD5(UTF8Encoding.UTF8.GetBytes(key)))
+            {
+                keyArray = m.ComputeHash(UTF8Encoding.UTF8.GetBytes(mensajeFecha));
+            }
+
+            hashBuild = Convert.ToBase64String(keyArray, 0, keyArray.Length);
+
+            string uri = BASE_URL + "ObtenerParadasCercanasPorLinea?" +
+                         "linea=" + linea + 
+                         "&longitud=" + lng + "&latitud=" + lat + 
                          "&id=" + idGeo +
                          "&hash=" + hashBuild + "&fecha=" + dayToSend;
 
