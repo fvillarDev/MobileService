@@ -108,6 +108,7 @@ namespace MobileService
         {
             try
             {
+                if (token.Length < 129) return "Error. Invalid Token";
                 string tkn1 = token.Substring(0, 128);
                 string tkn2 = token.Replace(tkn1, "");
 
@@ -151,6 +152,31 @@ namespace MobileService
                 cmd2.ExecuteNonQuery();
                 cnn.Close();
 
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
+        [WebMethod]
+        public string DeleteToken(string token)
+        {
+            try
+            {
+                string tkn1 = token.Substring(0, 128);
+                string tkn2 = token.Replace(tkn1, "");
+
+                string cnnStringGCM_News =
+                    "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
+                SqlConnection cnn = new SqlConnection(cnnStringGCM_News);
+                SqlCommand cmd =
+                    new SqlCommand("DELETE FROM GCM_News WHERE GCMToken='" + tkn1 + "' AND GCMToken2='" + tkn2 + "'",
+                        cnn);
+                cnn.Open();
+                cmd.ExecuteNonQuery();
+                cnn.Close();
                 return "OK";
             }
             catch (Exception ex)
@@ -248,6 +274,7 @@ namespace MobileService
 
         #region Tests
 
+        
         
 
         #endregion
