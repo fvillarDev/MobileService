@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
@@ -21,11 +23,13 @@ namespace MobileService
     [System.Web.Script.Services.ScriptService]
     public class ServiceMobile : System.Web.Services.WebService
     {
+        #region Properties
         private string idGeo = "dd540f1f-44ac-4929-a4e8-777a5d9b66b3";
         private string key = "n9tNJicGUqLc6KbDzeGoVNoDcNC70rjEgrXrKM8a";
         string BASE_URL = "http://ws_geosolution.geosolution.com.ar/mobile_test/Mobile/";
+        #endregion
 
-        //private const string SENDER_ID = "428884316981";
+        #region Web Methods
 
         [WebMethod]
         public string GetHourMobile(string stop, string bus)
@@ -98,7 +102,48 @@ namespace MobileService
                 throw ex.InnerException;
             }
         }
+        
+        [WebMethod]
+        public string AddNewGCMToken(string token)
+        {
+            try
+            {
+                string cnnStringGCM_News =
+                    "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
+                SqlConnection cnn = new SqlConnection(cnnStringGCM_News);
+                SqlCommand cmd = new SqlCommand("SELECT MAX(ID) FROM GCM_News", cnn);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                cnn.Open();
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                int maxId = 1;
+                if (ds.Tables.Count > 0)
+                {
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        maxId = Int32.Parse(ds.Tables[0].Rows[0].ToString());
+                        maxId++;
+                    }
+                }
 
+                string tkn1 = token.Substring(0, 128);
+                string tkn2 = token.Replace(tkn1, "");
+                string query = "INSERT INTO GCM_News VALUES(" + maxId + ",'" + tkn1 + "', '" + Guid.NewGuid().ToString() + "', '" + DateTime.Now.ToString("s") + "', '" + tkn2 + "')";
+                SqlCommand cmd2 = new SqlCommand(query, cnn);
+                cmd2.ExecuteNonQuery();
+                cnn.Close();
+
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private string GetData(string parada, string linea)
         {
@@ -180,5 +225,7 @@ namespace MobileService
             StreamReader sr = new StreamReader(resp.GetResponseStream());
             return sr.ReadToEnd().Trim();
         }
+
+        #endregion
     }
 }
