@@ -108,29 +108,44 @@ namespace MobileService
         {
             try
             {
+                string tkn1 = token.Substring(0, 128);
+                string tkn2 = token.Replace(tkn1, "");
+
                 string cnnStringGCM_News =
                     "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
                 SqlConnection cnn = new SqlConnection(cnnStringGCM_News);
-                SqlCommand cmd = new SqlCommand("SELECT MAX(ID) FROM GCM_News", cnn);
+                SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM GCM_News WHERE GCMToken='" + tkn1 + "' AND GCMToken2='" + tkn2 + "' " +
+                                                "SELECT MAX(ID) FROM GCM_News", cnn);
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                 cnn.Open();
                 DataSet ds = new DataSet();
                 adapter.Fill(ds);
                 int maxId = 1;
+                int exite = 0;
+
                 if (ds.Tables.Count > 0)
                 {
+                    if (ds.Tables[1].Rows.Count > 0)
+                    {
+                        if (!string.IsNullOrEmpty(ds.Tables[1].Rows[0][0].ToString()))
+                        {
+                            maxId = Int32.Parse(ds.Tables[1].Rows[0][0].ToString());
+                            maxId++;
+                        }
+                    }
+
                     if (ds.Tables[0].Rows.Count > 0)
                     {
                         if (!string.IsNullOrEmpty(ds.Tables[0].Rows[0][0].ToString()))
                         {
-                            maxId = Int32.Parse(ds.Tables[0].Rows[0][0].ToString());
-                            maxId++;
+                            exite = Int32.Parse(ds.Tables[0].Rows[0][0].ToString());
+                            if (exite != 0) return "Already Exists";
                         }
                     }
                 }
+                else return "Error";
 
-                string tkn1 = token.Substring(0, 128);
-                string tkn2 = token.Replace(tkn1, "");
+                
                 string query = "INSERT INTO GCM_News VALUES(" + maxId + ",'" + tkn1 + "', '" + Guid.NewGuid().ToString() + "', '" + DateTime.Now.ToString("s") + "', '" + tkn2 + "')";
                 SqlCommand cmd2 = new SqlCommand(query, cnn);
                 cmd2.ExecuteNonQuery();
