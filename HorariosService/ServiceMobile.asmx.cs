@@ -121,8 +121,11 @@ namespace MobileService
                 {
                     if (ds.Tables[0].Rows.Count > 0)
                     {
-                        maxId = Int32.Parse(ds.Tables[0].Rows[0].ToString());
-                        maxId++;
+                        if (!string.IsNullOrEmpty(ds.Tables[0].Rows[0][0].ToString()))
+                        {
+                            maxId = Int32.Parse(ds.Tables[0].Rows[0][0].ToString());
+                            maxId++;
+                        }
                     }
                 }
 
@@ -225,6 +228,12 @@ namespace MobileService
             StreamReader sr = new StreamReader(resp.GetResponseStream());
             return sr.ReadToEnd().Trim();
         }
+
+        #endregion
+
+        #region Tests
+
+        
 
         #endregion
     }
