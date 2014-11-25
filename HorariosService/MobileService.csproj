@@ -60,6 +60,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper.cs" />
     <Compile Include="HorariosData.cs" />
     <Compile Include="Resultado.cs" />
     <Compile Include="ServiceMobile.asmx.cs">

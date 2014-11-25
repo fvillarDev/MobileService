@@ -25,6 +25,8 @@ namespace MobileService
         private string key = "n9tNJicGUqLc6KbDzeGoVNoDcNC70rjEgrXrKM8a";
         string BASE_URL = "http://ws_geosolution.geosolution.com.ar/mobile_test/Mobile/";
 
+        //private const string SENDER_ID = "428884316981";
+
         [WebMethod]
         public string GetHourMobile(string stop, string bus)
         {
@@ -78,6 +80,23 @@ namespace MobileService
                     isNoData = false;
             }
             return res;
+        }
+
+        [WebMethod]
+        public void GetFeeds()
+        {
+            try
+            {
+                int cant = Helper.ReadFeeds();
+                if (cant > 0)
+                {
+                    Helper.GCMNotification(cant);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
 
