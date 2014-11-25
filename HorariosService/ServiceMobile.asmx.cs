@@ -152,7 +152,7 @@ namespace MobileService
                 cmd2.ExecuteNonQuery();
                 cnn.Close();
 
-                return "OK." + maxId;
+                return "OK" + maxId;
             }
             catch (Exception ex)
             {
