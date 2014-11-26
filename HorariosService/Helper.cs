@@ -140,7 +140,7 @@ namespace MobileService
                     DataSet rssData = new DataSet();
                     rssData.ReadXml(new StringReader(result), XmlReadMode.Auto);
 
-                    cant += rssData.Tables["item"].Rows.Cast<DataRow>().Where(row => ValidTitle(row["title"].ToString())).Count(row => TitleNotExists(row["title"].ToString()));
+                    cant += rssData.Tables["item"].Rows.Cast<DataRow>().Where(row => ValidTitle(row["title"].ToString())).Count(row => TitleNotExists(row["title"].ToString(), row["guid"].ToString()));
                 }
                 catch (Exception ex)
                 {
@@ -184,20 +184,21 @@ namespace MobileService
             }
         }
 
-        private static bool TitleNotExists(string title)
+        private static bool TitleNotExists(string title, string rawGuid)
         {
+            string guid = GetGuidFromRaw(rawGuid);
             if (DsFeeds.Tables.Count <= 0)
             {
                 UserIdTokenToSend = UserIdToken;
-                InsertFeed(title);
+                InsertFeed(title, guid);
                 return true;
             }
 
-            bool equals = DsFeeds.Tables[0].Rows.Count <= 0 || DsFeeds.Tables[0].Rows.Cast<DataRow>().All(row => row[0].ToString().Equals(title));
+            bool equals = DsFeeds.Tables[0].Rows.Count <= 0 || DsFeeds.Tables[0].Rows.Cast<DataRow>().All(row => row[3].ToString().Equals(guid));
 
             if (equals)
             {
-                string[] ids = DsFeeds.Tables[0].Select("Title='" + title + "'")[0][2].ToString().Split(',');
+                string[] ids = DsFeeds.Tables[0].Select("Guid='" + guid + "'")[0][2].ToString().Split(',');
                 foreach (string id in ids.Where(id => !UserIdToken.ContainsKey(id)))
                 {
                     string val = "";
@@ -206,32 +207,36 @@ namespace MobileService
                         UserIdTokenToSend.Add(id, val);
                 }
 
-                UpdateFeedIds(title);
+                UpdateFeedIds(guid);
                 return true;
             }
 
             UserIdTokenToSend = UserIdToken;
-            InsertFeed(title);
+            InsertFeed(title, guid);
             return true;
         }
 
-        private static void InsertFeed(string title)
+        private static void InsertFeed(string title, string guid)
         {
             SqlConnection cnn = new SqlConnection(cnnStringGCM_News);
             string ids = String.Join(",", UserIdToken.Keys.ToArray());
-            string query = "INSERT INTO GCM_Feeds VALUES('" + title + "', '" + DateTime.Now.ToString("s") + "', '" + ids + "')";
+            string query = "INSERT INTO GCM_Feeds VALUES('" + title + "', '" + DateTime.Now.ToString("s") + "', '" + ids + "', '" + guid + "')";
             SqlCommand cmd = new SqlCommand(query, cnn);
             cnn.Open();
             cmd.ExecuteNonQuery();
             cnn.Close();
         }
 
-        private static void UpdateFeedIds(string title)
+        private static void UpdateFeedIds(string guid)
         {
             SqlConnection cnn = new SqlConnection(cnnStringGCM_News);
             string ids = String.Join(",", UserIdToken.Keys.ToArray());
             ids += "," + String.Join(",", UserIdTokenToSend.Keys.ToArray());
-            string query = "UPDATE GCM_Feeds SET UserId='" + ids + "' WHERE Title='" + title + "'";
+            if (ids.EndsWith(","))
+            {
+                ids = ids.Substring(0, ids.Length - 1);
+            }
+            string query = "UPDATE GCM_Feeds SET UserId='" + ids + "' WHERE Guid='" + guid + "'";
             SqlCommand cmd = new SqlCommand(query, cnn);
             cnn.Open();
             cmd.ExecuteNonQuery();
@@ -258,6 +263,18 @@ namespace MobileService
                    || title.Contains("chofer") || title.Contains("transportes");
         }
 
+        private static string GetGuidFromRaw(string rawGuid)
+        {
+            if (rawGuid.Contains("lavoz") || rawGuid.Contains("diaadia"))
+            {
+                return rawGuid.Split(' ')[0];
+            }
+            if (rawGuid.Contains("lmcordoba"))
+            {   
+                return rawGuid.Replace("http://www.lmcordoba.com.ar/nota.php?ni=", "");
+            }
+            return rawGuid.Contains("cba24n") ? rawGuid.Replace("http://www.cba24n.com.ar/node/", "") : "";
+        }
         
     }
 }

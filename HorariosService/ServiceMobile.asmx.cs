@@ -122,7 +122,6 @@ namespace MobileService
                 DataSet ds = new DataSet();
                 adapter.Fill(ds);
                 int maxId = 1;
-                int exite = 0;
 
                 if (ds.Tables.Count > 0)
                 {
@@ -139,7 +138,7 @@ namespace MobileService
                     {
                         if (!string.IsNullOrEmpty(ds.Tables[0].Rows[0][0].ToString()))
                         {
-                            exite = Int32.Parse(ds.Tables[0].Rows[0][0].ToString());
+                            int exite = Int32.Parse(ds.Tables[0].Rows[0][0].ToString());
                             if (exite != 0) return "Already Exists";
                         }
                     }
@@ -271,9 +270,7 @@ namespace MobileService
 
         #region Tests
 
-        
-        
-
+  
         #endregion
     }
 }
