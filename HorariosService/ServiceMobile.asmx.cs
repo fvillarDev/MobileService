@@ -14,9 +14,6 @@ using System.Xml;
 
 namespace MobileService
 {
-    /// <summary>
-    /// Summary description for Service1
-    /// </summary>
     [WebService(Namespace = "http://androiddev.org/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
