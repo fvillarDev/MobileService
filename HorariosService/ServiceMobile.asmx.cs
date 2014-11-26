@@ -87,21 +87,12 @@ namespace MobileService
         }
 
         [WebMethod]
-        public string GetFeeds()
+        public void GetFeeds()
         {
-            try
+            int cant = Helper.ReadFeeds();
+            if (cant > 0)
             {
-                int cant = Helper.ReadFeeds();
-                if (cant > 0)
-                {
-                    Helper.GCMNotification(cant);
-                }
-
-                return "OK";
-            }
-            catch (Exception ex)
-            {
-                return ex.ToString();
+                Helper.GCMNotification(cant);
             }
         }
         
@@ -268,7 +259,6 @@ namespace MobileService
 
         #region Tests
 
-        //[WebMethod]
         public string Test()
         {
             try
@@ -277,9 +267,10 @@ namespace MobileService
                 //SqlCommand cmd =
                 //    new SqlCommand("SELECT * FROM GCM_Feeds",//"DELETE FROM GCM_Feeds",
                 //        cnn);
-                SqlCommand cmd =
-                    new SqlCommand("DELETE FROM GCM_News where ID=1",//"DELETE FROM GCM_Feeds",
-                        cnn);
+                //SqlCommand cmd =
+                //    new SqlCommand("DELETE FROM GCM_News where ID=1",//"DELETE FROM GCM_Feeds",
+                //        cnn);
+                SqlCommand cmd = new SqlCommand("UPDATE GCM_Feeds SET UserId=''", cnn);
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                 cnn.Open();
                 DataSet ds = new DataSet();
