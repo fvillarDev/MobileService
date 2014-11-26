@@ -161,7 +161,6 @@ namespace MobileService
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
                 }
             }
 
