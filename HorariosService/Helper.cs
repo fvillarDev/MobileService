@@ -17,7 +17,7 @@ namespace MobileService
     {
         public static string GetConnectionString()
         {
-            return cnnStringGCM_News;
+            return "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
         }
 
         public static DataSet DsFeeds = new DataSet();
@@ -25,9 +25,6 @@ namespace MobileService
         public static Dictionary<string, string> UserIdTokenToSend = new Dictionary<string, string>(); 
 
         private const string API_KEY = "AIzaSyAHMcqlO5o7GrGXpf6gD_-ndY1wxLQp_t4";
-        private const string cnnStringGCM_News =
-                    "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
-
 
         public static string SendGCMNotification(string apiKey, string postData, string postDataContentType = "application/json")
         {
@@ -73,7 +70,7 @@ namespace MobileService
             }
             catch (Exception e)
             {
-                return e.Message;
+                return e.ToString();
             }
         }
 
@@ -115,7 +112,7 @@ namespace MobileService
                         "\"subText\":\"" + subText + "\", " +
                         "\"message\": \"" + message + "\"}}";
 
-                    string response = Helper.SendGCMNotification(API_KEY, postData);
+                    SendGCMNotification(API_KEY, postData);
                 }
             }
             catch (Exception ex)
@@ -164,7 +161,7 @@ namespace MobileService
                 }
                 catch (Exception ex)
                 {
-                    throw ex.InnerException;
+                    throw ex;
                 }
             }
 
