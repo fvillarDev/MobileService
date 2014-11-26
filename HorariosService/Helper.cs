@@ -15,11 +15,8 @@ namespace MobileService
 {
     public class Helper
     {
-        public static string GetConnectionString()
-        {
-            return "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
-        }
-
+        private const string cnnString = "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
+        
         public static DataSet DsFeeds = new DataSet();
         public static Dictionary<string, string> UserIdToken = new Dictionary<string, string>();
         public static Dictionary<string, string> UserIdTokenToSend = new Dictionary<string, string>(); 
@@ -88,7 +85,7 @@ namespace MobileService
             try
             {
                 string DEVICE_TOKEN = "";
-                //SqlConnection cnn = new SqlConnection(GetConnectionString());
+                //SqlConnection cnn = new SqlConnection(cnnString);
                 //SqlCommand cmd = new SqlCommand("SELECT * FROM GCM_News", cnn);
                 //SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                 //cnn.Open();
@@ -169,7 +166,7 @@ namespace MobileService
 
         private static void GetPreviousFeeds()
         {
-            SqlConnection cnn = new SqlConnection(GetConnectionString());
+            SqlConnection cnn = new SqlConnection(cnnString);
             string query = "SELECT * FROM GCM_Feeds";
             string queryDelete = "DELETE FROM GCM_Feeds WHERE FeedDate < '" + DateTime.Now.AddDays(-7).ToString("s") + "'";
             SqlCommand cmd = new SqlCommand(query, cnn);
@@ -186,7 +183,7 @@ namespace MobileService
         {
             UserIdToken = new Dictionary<string, string>();
             UserIdTokenToSend = new Dictionary<string, string>();
-            SqlConnection cnn = new SqlConnection(GetConnectionString());
+            SqlConnection cnn = new SqlConnection(cnnString);
             SqlCommand cmd = new SqlCommand("SELECT ID, GCMToken, GCMToken2 FROM GCM_News", cnn);
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             cnn.Open();
@@ -238,7 +235,7 @@ namespace MobileService
 
         private static void InsertFeed(string title, string guid)
         {
-            SqlConnection cnn = new SqlConnection(GetConnectionString());
+            SqlConnection cnn = new SqlConnection(cnnString);
             string ids = String.Join(",", UserIdToken.Keys.ToArray());
             string query = "INSERT INTO GCM_Feeds VALUES('" + title + "', '" + DateTime.Now.ToString("s") + "', '" + ids + "', '" + guid + "')";
             SqlCommand cmd = new SqlCommand(query, cnn);
@@ -249,7 +246,7 @@ namespace MobileService
 
         private static void UpdateFeedIds(string guid)
         {
-            SqlConnection cnn = new SqlConnection(GetConnectionString());
+            SqlConnection cnn = new SqlConnection(cnnString);
             string ids = String.Join(",", UserIdToken.Keys.ToArray());
             ids += "," + String.Join(",", UserIdTokenToSend.Keys.ToArray());
             if (ids.EndsWith(","))

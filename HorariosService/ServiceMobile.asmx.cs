@@ -27,6 +27,7 @@ namespace MobileService
         private string idGeo = "dd540f1f-44ac-4929-a4e8-777a5d9b66b3";
         private string key = "n9tNJicGUqLc6KbDzeGoVNoDcNC70rjEgrXrKM8a";
         string BASE_URL = "http://ws_geosolution.geosolution.com.ar/mobile_test/Mobile/";
+        private const string cnnString = "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
         #endregion
 
         #region Web Methods
@@ -105,7 +106,7 @@ namespace MobileService
                 string tkn1 = token.Substring(0, 128);
                 string tkn2 = token.Replace(tkn1, "");
 
-                SqlConnection cnn = new SqlConnection(Helper.GetConnectionString());
+                SqlConnection cnn = new SqlConnection(cnnString);
                 SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM GCM_News WHERE GCMToken='" + tkn1 + "' AND GCMToken2='" + tkn2 + "' " +
                                                 "SELECT MAX(ID) FROM GCM_News", cnn);
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -155,7 +156,7 @@ namespace MobileService
         {
             try
             {
-                SqlConnection cnn = new SqlConnection(Helper.GetConnectionString());
+                SqlConnection cnn = new SqlConnection(cnnString);
                 SqlCommand cmd =
                     new SqlCommand("DELETE FROM GCM_News WHERE ID='" + token + "'",
                         cnn);
@@ -263,7 +264,7 @@ namespace MobileService
         {
             try
             {
-                SqlConnection cnn = new SqlConnection(Helper.GetConnectionString());
+                SqlConnection cnn = new SqlConnection(cnnString);
                 //SqlCommand cmd =
                 //    new SqlCommand("SELECT * FROM GCM_Feeds",//"DELETE FROM GCM_Feeds",
                 //        cnn);
