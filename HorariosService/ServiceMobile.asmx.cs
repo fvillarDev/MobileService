@@ -270,6 +270,30 @@ namespace MobileService
 
         #region Tests
 
+        
+        public string Test()
+        {
+            try
+            {
+                string cnnStringGCM_News =
+                    "Server=08b75c75-cfac-4d9b-b023-a39b01057665.sqlserver.sequelizer.com;Database=db08b75c75cfac4d9bb023a39b01057665;User ID=dkeybpcggpoutvaf;Password=CJPQEYNWiXiAY5TUxzy8DHJ3sbQDHbPEGZkyK3ZrTvYnAMytZWzuzbR4aVwCiing;";
+                SqlConnection cnn = new SqlConnection(cnnStringGCM_News);
+                SqlCommand cmd =
+                    new SqlCommand("SELECT * FROM GCM_News",//"DELETE FROM GCM_Feeds",
+                        cnn);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                cnn.Open();
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                //cmd.ExecuteNonQuery();
+                cnn.Close();
+                return "OK";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
   
         #endregion
     }

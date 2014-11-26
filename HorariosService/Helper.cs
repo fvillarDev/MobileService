@@ -139,11 +139,26 @@ namespace MobileService
                     if (string.IsNullOrEmpty(result)) continue;
                     DataSet rssData = new DataSet();
                     rssData.ReadXml(new StringReader(result), XmlReadMode.Auto);
+                    string rawGuid = "";
+                    if (url.Contains("lavoz") || url.Contains("cba24n"))
+                    {
+                        for (int i = 0; i < rssData.Tables["item"].Rows.Count; i++)
+                        {
+                            if (!ValidTitle(rssData.Tables["item"].Rows[i]["title"].ToString())) continue;
+                            rawGuid = rssData.Tables["guid"].Rows[i]["guid_Text"].ToString();
+                            cant++;
+                            TitleNotExists(rssData.Tables["item"].Rows[i]["title"].ToString(), rawGuid);
+                        }
 
-                    cant += rssData.Tables["item"].Rows.Cast<DataRow>().Where(row => ValidTitle(row["title"].ToString())).Count(row => TitleNotExists(row["title"].ToString(), row["guid"].ToString()));
+                    }
+                    else
+                    {
+                        cant += rssData.Tables["item"].Rows.Cast<DataRow>().Where(row => ValidTitle(row["title"].ToString())).Count(row => TitleNotExists(row["title"].ToString(), row["guid"].ToString()));
+                    }
                 }
                 catch (Exception ex)
                 {
+                    throw ex.InnerException;
                 }
             }
 
@@ -194,21 +209,24 @@ namespace MobileService
                 return true;
             }
 
-            bool equals = DsFeeds.Tables[0].Rows.Count <= 0 || DsFeeds.Tables[0].Rows.Cast<DataRow>().All(row => row[3].ToString().Equals(guid));
-
-            if (equals)
+            if (DsFeeds.Tables[0].Rows.Count > 0)
             {
-                string[] ids = DsFeeds.Tables[0].Select("Guid='" + guid + "'")[0][2].ToString().Split(',');
-                foreach (string id in ids.Where(id => !UserIdToken.ContainsKey(id)))
-                {
-                    string val = "";
-                    UserIdTokenToSend.TryGetValue(id, out val);
-                    if(!string.IsNullOrEmpty(val))
-                        UserIdTokenToSend.Add(id, val);
-                }
+                bool equals = DsFeeds.Tables[0].Rows.Cast<DataRow>().Any(row => row[3].ToString().Equals(guid));
 
-                UpdateFeedIds(guid);
-                return true;
+                if (equals)
+                {
+                    string[] ids = DsFeeds.Tables[0].Select("Guid='" + guid + "'")[0][2].ToString().Split(',');
+                    foreach (string id in ids.Where(id => !UserIdToken.ContainsKey(id)))
+                    {
+                        string val = "";
+                        UserIdTokenToSend.TryGetValue(id, out val);
+                        if (!string.IsNullOrEmpty(val))
+                            UserIdTokenToSend.Add(id, val);
+                    }
+
+                    UpdateFeedIds(guid);
+                    return true;
+                }
             }
 
             UserIdTokenToSend = UserIdToken;
